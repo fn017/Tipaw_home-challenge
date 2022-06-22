@@ -1,0 +1,36 @@
+### Register user given their data, returns the user and token upon successful registration
+POST  http://localhost:5000/api/auth/register
+content-type: application/json
+
+{
+  "email": "hello@email.com", 
+  "password": "Test@123",
+  "confirmPassword": "Test@123",
+  "firstName": "Bilal",
+  "lastName": "Ashraf",
+  "acceptedTerms": true
+}
+### login user given their email and password, returns the user and token upon successful login
+POST  http://localhost:5000/api/auth/login
+content-type: application/json
+
+{
+  "email": "hello@email.com", 
+  "password": "Test@123"
+}
+
+### logout user given their refresh token
+POST  http://localhost:5000/api/auth/logout
+content-type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOWQ5YjU1ZC0zZTlhLTRhNWEtYWY2Ni0zNjkxMDZjNDY3MDQiLCJpYXQiOjE2NTU5MDQ2MDMsImV4cCI6MTY1ODQ5NjYwMywidHlwZSI6InJlZnJlc2gifQ.Ioc7YcqJhzO-bVT2XmPLIjVv-xJeKazNoyfYXEhLxZ4"
+}
+
+### Refresh accessToken and get user
+POST  http://localhost:5000/api/auth/refresh-tokens
+content-type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOWQ5YjU1ZC0zZTlhLTRhNWEtYWY2Ni0zNjkxMDZjNDY3MDQiLCJpYXQiOjE2NTU5MDUxNDMsImV4cCI6MTY1ODQ5NzE0MywidHlwZSI6InJlZnJlc2gifQ.Uf9Fvy5pFWSvMTusd6yMTIVaZezCcTATmA_pn1WE_zY"
+}
