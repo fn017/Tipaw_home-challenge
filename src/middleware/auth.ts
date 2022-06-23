@@ -1,43 +1,36 @@
-import passport from "passport";
+import { ApiError } from "../utils";
 import httpStatus from "http-status";
-import ApiError from "../utils/ApiError";
-import { roleRights } from "../config/roles";
 
-const verifyCallback =
-  (req, resolve, reject, requiredRights) => async (err, user, info) => {
-    if (err || info || !user) {
-      return reject(
-        new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate")
-      );
-    }
-    req.user = user;
+import jwt from "jsonwebtoken";
+import { config } from "../config";
+const AuthRoutes = ["login", "register"];
 
-    if (requiredRights.length) {
-      const userRights = roleRights.get(user.role);
-      const hasRequiredRights = requiredRights.every((requiredRight) =>
-        userRights.includes(requiredRight)
-      );
-      if (!hasRequiredRights && req.params.userId !== user.id) {
-        return reject(new ApiError(httpStatus.FORBIDDEN, "Forbidden"));
-      }
-    }
+const verifySecurityHeader = (header) => {
+  try {
+    const accessToken = header.split(" ")[1];
 
-    resolve();
-  };
+    const result = jwt.verify(accessToken, config.jwt.secret);
+    console.log(result);
+    return !!result;
+  } catch (error) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
+  }
+};
 
-const auth =
-  (...requiredRights: string[]) =>
-  async (req, res, next) => {
-    console.log(req.headers);
-    return new Promise((resolve, reject) => {
-      passport.authenticate(
-        "jwt",
-        { session: false },
-        verifyCallback(req, resolve, reject, requiredRights)
-      )(req, res, next);
-    })
-      .then(() => next())
-      .catch((err) => next(err));
-  };
+const auth = (req, _res, next) => {
+  const operationName = req.body.operationName;
+  if (AuthRoutes.includes(operationName)) {
+    next();
+    return;
+  }
+
+  const isVerified = verifySecurityHeader(req.headers.authorization);
+
+  if (isVerified) {
+    next();
+  } else {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
+  }
+};
 
 export default auth;

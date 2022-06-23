@@ -2,9 +2,7 @@ import httpStatus from "http-status";
 // import { User } from '../models';
 import ApiError from "../utils/ApiError";
 import { prisma } from "../config";
-
-import { v4 as uuid } from "uuid";
-const bcrypt = require("bcryptjs");
+import bcrypt from "bcryptjs";
 
 /**
  * Create a user
@@ -20,7 +18,6 @@ const createUser = async (userBody) => {
       lastName,
       email,
       password: hashedPassword,
-      id: uuid(),
     },
   });
 
@@ -82,25 +79,14 @@ const updateUserById = async (userId, updateBody) => {
   if (updateBody.email && (await isEmailTaken(updateBody.email, user.id))) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
   }
-  Object.assign(user, updateBody);
-  // await user.save();
-  return user;
-};
-
-/**
- * Delete user by id
- */
-const deleteUserById = async (userId) => {
-  const user = await getUserById(userId);
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-  }
-  const deletedUser = await prisma.user.delete({
+  const updatedUser = await prisma.user.update({
     where: {
       id: userId,
     },
+    data: updateBody,
   });
-  return deletedUser;
+  // await user.save();
+  return updatedUser;
 };
 
 export default {
@@ -110,5 +96,4 @@ export default {
   getUserById,
   getUserByEmail,
   updateUserById,
-  deleteUserById,
 };

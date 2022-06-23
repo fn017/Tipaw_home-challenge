@@ -20,7 +20,7 @@
     "noImplicitAny": false,
     "sourceMap": false,
     "outDir": "dist",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
       "@types": ["src/types"],
       "@types/*": ["src/types/*"],

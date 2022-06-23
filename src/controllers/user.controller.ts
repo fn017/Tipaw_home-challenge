@@ -1,38 +1,32 @@
-import { Response, Request } from "express";
-import httpStatus from "http-status";
+import { ApiResponse } from "../utils";
 import { userService } from "../services";
 
-import catchAsync from "../utils/catchAsync";
+const createUser = async (_parent, args, _context, _info) => {
+  console.log("createUser, success", args);
+};
 
-const createUser = catchAsync(async (req: Request, res: Response) => {
-  console.log("createUser, success", req);
-  res.status(httpStatus.OK).send("createUser");
-});
+const getUser = async (_parent, args, _context, _info) => {
+  const user = await userService.getUserById(args.userId);
+  return user;
+};
 
-const getUser = catchAsync(async (req: Request, res: Response) => {
-  const user = await userService.getUserById(req.params.userId);
-  res.status(httpStatus.OK).send(user);
-});
+const getUsers = async (_parent, _args, _req, _gql) => {
+  try {
+    const users = await userService.queryUsers({}, {});
+    return users;
+  } catch (err: any) {
+    throw ApiResponse(err);
+  }
+};
 
-const getUsers = catchAsync(async (_req: Request, res: Response) => {
-  const users = await userService.queryUsers({}, {});
-  res.status(httpStatus.OK).send(users);
-});
-
-const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const user = await userService.updateUserById(req.params.userId, req.body);
-  res.status(httpStatus.OK).send(user);
-});
-
-const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const user = await userService.deleteUserById(req.params.userId);
-  res.status(httpStatus.OK).send(user);
-});
+const updateUser = async (_parent, args, _context, _info) => {
+  const user = await userService.updateUserById(args.userId, args.updateBody);
+  return user;
+};
 
 export default {
   createUser,
   getUser,
   getUsers,
   updateUser,
-  deleteUser,
 };
